@@ -25,7 +25,7 @@ public class Client extends JFrame{
                 new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
-                        sendData(actionEvent.getActionCommand());
+                        sendMessage(actionEvent.getActionCommand());
                         userText.setText("");
                     }
                 }
@@ -67,5 +67,64 @@ public class Client extends JFrame{
         showMessage("\n Dude your streams are now good to go! \n");
     }
 
+    //while chatting with server
+    private void whileChatting() throws IOException{
+        ableToType(true);
+        do {
+            try {
+                message = (String) input.readObject();
+                showMessage("\n" + message);
+            }catch (ClassNotFoundException classNotfoundException){
+                showMessage("\n I dont know that object type");
+            }
+        }while (!message.equals("SERVER - END"));
+    }
 
+    //close the streams and sockets
+    private void closeCrap(){
+        showMessage("\n closing crap down...");
+        ableToType(false);
+        try{
+            output.close();
+            input.close();
+            connection.close();
+        }catch (IOException ioException){
+            ioException.printStackTrace();
+        }
+    }
+
+    //send messages to server
+    private void sendMessage(String message){
+        try{
+            output.writeObject("CLIENT - " + message);
+            output.flush();
+            showMessage("\n CLIENT - " + message);
+        }catch (IOException ioException){
+            chatWindow.append("\n something messed up sending message hoss!");
+        }
+    }
+
+    //change/update chatWindow
+    private void showMessage(final String m){
+        SwingUtilities.invokeLater(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        chatWindow.append(m);
+                    }
+                }
+        );
+    }
+
+    //gives user permission to type crap into the text box
+    private void ableToType(final boolean tof){
+        SwingUtilities.invokeLater(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        userText.setEditable(tof);
+                    }
+                }
+        );
+    }
 }
