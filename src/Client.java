@@ -25,9 +25,31 @@ public class Client extends JFrame{
                 new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
-                        
+                        sendData(actionEvent.getActionCommand());
+                        userText.setText("");
                     }
                 }
         );
+        add(userText, BorderLayout.NORTH);
+        chatWindow = new JTextArea();
+        add(new JScrollPane(chatWindow), BorderLayout.CENTER);
+        setSize(300, 150);
+        setVisible(true);
     }
+
+    //connect to server
+    public void startRunning(){
+        try{
+            connectToServer();
+            setupStreams();
+            whileChatting();
+        }catch (EOFException eofException){
+            showMessage("\n Client terminated connection");
+        }catch (IOException ioException){
+            ioException.printStackTrace();
+        }finally {
+            closeCrap();
+        }
+    }
+
 }
